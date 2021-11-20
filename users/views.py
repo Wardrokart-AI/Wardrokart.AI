@@ -2,19 +2,26 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpResponse
 from django.contrib import messages,auth
+# from django.contrib.auth.models import User
+from products.models import Product
 from django.contrib.auth.decorators import login_required
 from django.utils.datastructures import MultiValueDictKeyError
 from django.core.paginator import Paginator
 from django.contrib.auth import login
+# from decorators import customer_required
 from django.contrib.auth.decorators import login_required
+import users.face_detect as face_detect
 from users.models import Profile,User,UserUploads
+from orders.models import Order
 from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
                                   UpdateView)
+from categories.models import Category
 from django.shortcuts import get_object_or_404, redirect, render
 from users.forms import SellerSignUpForm
 import base64
 from PIL import Image
 from io import BytesIO
+import cv2
 import numpy as np
 from django.core.files import File
 from django.core.files.base import ContentFile
@@ -94,7 +101,7 @@ def login_customer(request):
 			# is_seller = User.objects.filter(username = username).values("is_seller")[0]["is_seller"]
 
 			if user is not None and is_customer:
-				# res = face_detect.check(user)
+				res = face_detect.check(user)
 				res = True
 				if res:
 					auth.login(request,user)
@@ -105,7 +112,7 @@ def login_customer(request):
 
 
 			elif user is not None and is_seller:
-				# res = face_detect.check(user)
+				res = face_detect.check(user)
 				res = True
 				if res:
 					auth.login(request,user)
@@ -123,4 +130,65 @@ def login_customer(request):
 	else:
 		messages.error(request,'You Are Alredy Logged In')
 		return redirect('users:dashboard')
+
+
+
+@login_required(login_url="/users/login")
+def dashboard_customer(request):
+	print("DASHBOARD PRINTING")
+	orders = Order.objects.filter(user_id=request.user.id)
+	print(orders)
+	context = {
+		'title': request.user.username + ' Shopping Details',
+		'orders': orders
+	}
+	return render(request,'users/dashboard.html',context)
+
+
+
+@login_required(login_url="/users/login")
+def profile_customer(request,user_id):
+	if request.method == 'POST':
+		try:
+			image = request.FILES['image']
+		except MultiValueDictKeyError:
+			image = False
+		title = request.POST['title']
+		user = get_object_or_404(User,pk=user_id)
+		
+		
+		if image == False:
+			return redirect('users:profile',user_id = user_id)
+		else:
+			cat = UserUploads.objects.create(
+						user = user,
+						title=title,
+						photo=image
+					)
+
+			cat.save()
+			print("UserUploads")
+			messages.success(request,'Image Added to Profile SuccessFully')
+			return redirect('users:profile',user_id = user_id)
+	else:
+		if(request.user.is_customer):
+			user_id = request.user.id
+			products = UserUploads.objects.filter(user=user_id)
+
+			context = {
+
+				# 'title':request.user.name,
+				'products':products,
+			}
+			return render(request ,'users/profile.html' , context)
+
+		return render(request,'users/profile.html')
+
+@login_required(login_url="/users/login")
+def logout_customer(request):
+	if request.method == 'POST':
+		auth.logout(request)
+		messages.success(request,'You Are Now Logged Out')
+		return redirect('pages:home')
+
 

@@ -140,3 +140,64 @@ def checkout(request):
 		messages.info(request,"Your cart Is Empty")
 		return redirect('/')
 
+@login_required(login_url="/users/login")
+def confrm_checkout(request):
+	if len(request.session['cart']) != 0:
+		if request.method == 'POST':
+			name = request.POST['name']
+			phone = request.POST['phonenumber']
+			email = request.POST['email']
+			address = request.POST['address']
+			user_id = request.user.id
+			orders=[]
+			tot_price=0
+			if name and phone and email and address:
+				for key,value in request.session['cart'].items():
+					item = value['title']
+					product_id = value['productid']
+					product_object = Product.objects.filter(productid = product_id)[0]
+					quantity = value['quantity']
+					price = value['price']
+					total = (float(quantity) * float(price))
+					order = Order(item=item,
+					productid=product_object ,
+					quantity=quantity,
+					price=price,
+					total=total,
+					name=name,
+					phone=phone,
+					email=email,
+					address=address,
+					user_id=user_id
+					)
+					order.save()
+					orders.append(order)
+					tot_price += order.total
+
+				content='Hi '+request.user.username+'\n\nYour recent order with order id: '+str(order.id)+' has been successfully placed.\
+				Kindly, wait for the Seller to respond to your order.\n'
+				send_mail("Order INVOICE", content, settings.SENDER_EMAIL, [request.user.email], fail_silently=True)
+				content='Hi '+product_object.user.username+'\n\nCurrently an order with order id: '+str(order.id)+' has been successfully placed at your account.\
+				Kindly, check the order and respond favourably to the customer.\n'
+				send_mail("Order Alert!!", content, settings.SENDER_EMAIL, [product_object.user.email], fail_silently=True)
+				# cart = Cart(request)
+				# cart.clear()
+				context ={
+					'key': settings.STRIPE_PUBLISHABLE_KEY,
+        			'orders': orders,
+        			'price':int(tot_price)*100,
+					'price2':tot_price
+				}
+				# messages.success(request,'Order Created SuccessFully')
+				return render(request, 'payments/home.html', context)
+			else:
+				messages.info(request,'Filled All The Field')
+				return redirect('cart:checkout')
+		else:
+			messages.warning(request,'SomeThing Went Wrong')
+			return redirect('cart:checkout')
+	else:
+		messages.info(request,"Your cart Is Empty")
+		return redirect('/')
+
+
