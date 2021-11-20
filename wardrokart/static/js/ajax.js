@@ -13,8 +13,6 @@ $(function(){
             url:"search/",
             data:{
                 'search_text':x,
-                //  $('#search').val(),
-                // 'csrfmiddlewaretoken':$("input|name=csrfmiddlewaretoken").val()
 
             },
             success:searchSuccess,
@@ -32,15 +30,7 @@ function searchSuccess(data , textStatus,jqXHR)
 }
 
 
-// $(document).ready(function() {
-//     $('.mdb-select').materialSelect();
-//     });
-
-    // function submit_review(){
         jQuery(document).on('click', '#p112', function (e) {
-
-        // $('#p112').on('click', function(e) {
-
             e.preventDefault();
             var Text = $("#Text").val();
             var TextId = $("#pid").val();
@@ -59,7 +49,7 @@ function searchSuccess(data , textStatus,jqXHR)
                         var data_2 = "";
                         var data_1 = data;
                         var length = data_1.length;
-                        var index = data_1.indexOf("jayitsaha")
+                        var index = data_1.indexOf("rishabhkeshan")
                         data_2 = data_1.slice(0,index);
                         data_1 = data_1.slice(index+9,length);
 
@@ -69,7 +59,6 @@ function searchSuccess(data , textStatus,jqXHR)
 
                 },
                 error: function (response) {
-                    // alert the error if any error occured
                     console.log(response);
                 }
 
