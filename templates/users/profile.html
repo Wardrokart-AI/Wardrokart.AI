@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+    Profile
+{% endblock title %}
+
+{% block content %}
+
+<section id="home-section" class="hero">
+    <div class="home-slider owl-carousel">
+      {% if products%}
+        {% for product in products %}
+      <div class="slider-item" style="background-image: url('{{product.photo.url}}')">;">
+        <div class="overlay"></div>
+        <div class="container">
+          <div class="row slider-text justify-content-center align-items-center" data-scrollax-parent="true">
+  
+            <div class="col-md-12 ftco-animate text-center">
+              <h1 class="mb-2" style="color:white">{{product.title}}</h1>
+              <h2 class="subheading mb-4">All about fashion</h2>
+              <p><a href="#" class="btn btn-primary">View Details</a></p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+  
+      {%endfor%}
+      {%endif%}
+    </div>
+  </section>
+
+    <div class="col-md-12 container">
+        <h4 class="subheading mb-6" style="margin-left:15px;color:#222222;">Create your Gallery, and we will Recommend</h2>
+
+        <form action="{% url "users:profile" user.id %}" method="POST" enctype="multipart/form-data">
+
+
+                {% csrf_token %}
+
+
+        <div class="col-md-6 float-left">
+
+           <div class="form-group">
+                <h6 class="subheading"><b>Title</b></h6>
+                <input type="text" name="title" class="form-control" value="" >
+            </div>
+
+
+        </div>
+
+        <div class="col-md-12 float-right" style="margin-bottom:50px">
+            <h6 class="subheading"><b>Add another Picture to your collection</b></h6>
+            <input type="file" name="image" class="fomr-control">
+        </div>
+
+        <div class="form-group" style="width: fit-content;margin-left:15px">
+            <input type="submit" value="ADD"  class="btn btn-primary">
+        </div>
+
+        </form>
+    </div>
+
+
+
+
+
+
+{% endblock content %}
+
