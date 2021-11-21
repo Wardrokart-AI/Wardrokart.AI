@@ -12,7 +12,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 
-from chatbot.intent import HelloIntent
+from chatbot.intent import HelloIntent, AddItemsIntent,RemoveItemsIntent, ClearListIntent, ShowItemsIntent, ShowStatsIntent,WishBackIntent
 
 class ShoppingBot(object):
     def __init__(self, training_data_file = BASE_DIR+"/chatbot1/data/shopping-list/rasa/shopping-list-small.json", config_file = BASE_DIR+"/chatbot1/config/shopping-list/config_spacy.json"):
@@ -32,7 +32,13 @@ class ShoppingBot(object):
 
         self.intents = {
                 "greet"     : HelloIntent(self, "greet", context),
-              
+                "add_item"  : AddItemsIntent(self, "add_item", context),
+                "remove_item"  : RemoveItemsIntent(self, "remove_item", context1),
+                "clear_list": ClearListIntent(self, "clear_list", context),
+                "show_items": ShowItemsIntent(self, "show_items", context),
+                "_num_items": ShowStatsIntent(self, "_num_items", context),
+                "wishback"  : WishBackIntent(self, "wishback", context),
+                "inform"  : GetCoronaUpdate(self, "inform", context),
 
 
 
