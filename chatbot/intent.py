@@ -1,6 +1,7 @@
 
 
 from chatbot.command import GreetCommand, AddItemCommand, RemoveItemCommand, ShowItemsCommand, ClearListCommand, ShowStatsCommand,WishBackCommand,SuggestCorona
+
 class Intent(object):
 
     def __init__(self, bot, intent_name, context):
